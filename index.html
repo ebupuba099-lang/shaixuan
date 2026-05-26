@@ -3460,8 +3460,8 @@ function updateRc3Range(){
 }
 
 function updateRc3Display(){
-  document.getElementById('rc3-min').textContent=state.rongcuo3.minErr;
-  document.getElementById('rc3-max').textContent=state.rongcuo3.maxErr;
+  document.getElementById('rc3-min').value=state.rongcuo3.minErr;
+  document.getElementById('rc3-max').value=state.rongcuo3.maxErr;
 }
 
 function adjustRc3(which,delta){
@@ -3617,8 +3617,8 @@ function updateRcRange(){
 }
 
 function updateRcDisplay(){
-  document.getElementById('rc-min').textContent=state.rongcuo.minErr;
-  document.getElementById('rc-max').textContent=state.rongcuo.maxErr;
+  document.getElementById('rc-min').value=state.rongcuo.minErr;
+  document.getElementById('rc-max').value=state.rongcuo.maxErr;
 }
 
 function adjustRc(which,delta){
@@ -4239,7 +4239,7 @@ document.getElementById('rcBtn3').onclick=function(){
   showRongcuo3();
 };
 // 输入框不再实时渲染，避免卡顿
-  // document.getElementById('searchInput').oninput=function(){renderResults('')};
+  // oninput removed - no longer real-time render to fix lag
 document.getElementById('searchInput').onkeydown=function(e){if(e.key==='Enter')document.getElementById('searchBtn').click()};
 document.getElementById('searchBtn').onclick=function(){
   const keyword=document.getElementById('searchInput').value.trim();
