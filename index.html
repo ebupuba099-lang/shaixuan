@@ -305,11 +305,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
 <span style="font-size:13px;color:#555">容错范围：</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',-1)">-</button>
-<span id="rc-min" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
-	<button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',1)">+</button>
+<input id="rc-min" type="number" min="0" style="width:36px;font-size:15px;font-weight:600;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px" value="0" onchange="setRcValue('min',this.value)">
+<button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',1)">+</button>
 <span style="color:#999">~</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('max',-1)">-</button>
-<span id="rc-max" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
+<input id="rc-max" type="number" min="0" style="width:36px;font-size:15px;font-weight:600;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px" value="0" onchange="setRcValue('max',this.value)">
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('max',1)">+</button>
 </div>
 <div style="display:flex;gap:8px;margin-top:10px">
@@ -471,11 +471,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
 <span style="font-size:13px;color:#555">容错范围：</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',-1)">-</button>
-<span id="rc3-min" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
-	<button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',1)">+</button>
+<input id="rc3-min" type="number" min="0" style="width:36px;font-size:15px;font-weight:600;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px" value="0" onchange="setRc3Value('min',this.value)">
+<button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',1)">+</button>
 <span style="color:#999">~</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('max',-1)">-</button>
-<span id="rc3-max" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
+<input id="rc3-max" type="number" min="0" style="width:36px;font-size:15px;font-weight:600;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px" value="0" onchange="setRc3Value('max',this.value)">
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('max',1)">+</button>
 </div>
 <div style="display:flex;gap:8px;margin-top:10px">
@@ -3468,6 +3468,18 @@ function adjustRc3(which,delta){
   }
   updateRc3Display();
 }
+function setRc3Value(which,val){
+  const n=state.rongcuo3.selected.size;
+  if(n===0)return;
+  let v=parseInt(val)||0;
+  v=Math.max(0,Math.min(v,n));
+  if(which==='min'){
+    state.rongcuo3.minErr=Math.min(v,state.rongcuo3.maxErr);
+  }else{
+    state.rongcuo3.maxErr=Math.max(state.rongcuo3.minErr,v);
+  }
+  updateRc3Display();
+}
 
 // 当前激活的组（四字模式）
 let rcActiveGroup = 1;
@@ -3610,6 +3622,18 @@ function adjustRc(which,delta){
     state.rongcuo.minErr=Math.max(0,Math.min(state.rongcuo.minErr+delta,state.rongcuo.maxErr));
   }else{
     state.rongcuo.maxErr=Math.max(state.rongcuo.minErr,Math.min(state.rongcuo.maxErr+delta,n));
+  }
+  updateRcDisplay();
+}
+function setRcValue(which,val){
+  const n=state.rongcuo.selected.size;
+  if(n===0)return;
+  let v=parseInt(val)||0;
+  v=Math.max(0,Math.min(v,n));
+  if(which==='min'){
+    state.rongcuo.minErr=Math.min(v,state.rongcuo.maxErr);
+  }else{
+    state.rongcuo.maxErr=Math.max(state.rongcuo.minErr,v);
   }
   updateRcDisplay();
 }
@@ -4208,7 +4232,8 @@ document.getElementById('rcBtn3').onclick=function(){
   state.rongcuo3.maxErr=2;
   showRongcuo3();
 };
-document.getElementById('searchInput').oninput=function(){renderResults('')};
+// 输入框不再实时渲染，避免卡顿
+  // document.getElementById('searchInput').oninput=function(){renderResults('')};
 document.getElementById('searchInput').onkeydown=function(e){if(e.key==='Enter')document.getElementById('searchBtn').click()};
 document.getElementById('searchBtn').onclick=function(){
   const keyword=document.getElementById('searchInput').value.trim();
@@ -4233,12 +4258,12 @@ document.getElementById('searchBtn').onclick=function(){
   });
   renderResults(keyword);
   if(found.length>0){
-    const show=found.slice(0,20);
-    let msg='找到 '+found.length+' 组匹配：\n\n'+show.join('  ');
-    if(found.length>20)msg+='\n\n...还有'+(found.length-20)+'组';
+    const show=found.slice(0,50);
+    let msg='找到 ('+found.length+') 组：\n\n'+show.join('  ');
+    if(found.length>50)msg+='\n\n...还有'+(found.length-50)+'组';
     customAlert('查找结果',msg);
   }else{
-    customAlert('查找结果','未找到包含 "'+keyword+'" 的号码');
+    customAlert('查找结果','未找到 ('+keyword+')');
   }
 };
 
