@@ -82,21 +82,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .modal-body .example{background:#f5f7fa;border-radius:6px;padding:8px 12px;margin:6px 0;font-size:12px}
 .modal-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#666}
 .modal-close:hover{background:#e0e0e0}
-
-/* ===== PC端宽屏：条件卡片自动分两列（不改原有配色） ===== */
-@media (min-width: 768px) {
-  body{max-width:1300px;margin:0 auto;padding:90px 20px 80px 20px}
-  .mode-tabs{max-width:500px;margin:0 auto 10px;position:static}
-  .top-nav{position:static;background:transparent;max-width:1000px;margin:0 auto 12px}
-  #mode-4,#mode-3,#mode-2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;align-items:start}
-  #mode-4>.card:nth-child(n),#mode-3>.card:nth-child(n),#mode-2>.card:nth-child(n){margin-top:0}
-  #mode-4>.card:first-child,#mode-3>.card:first-child,#mode-2>.card:first-child,
-  #mode-4>div[style*="display:flex"],#mode-3>div[style*="display:flex"],#mode-2>div[style*="display:flex"],
-  #rongcuo-card,#rongcuo3-card{grid-column:1/-1}
-}
-@media (min-width: 1200px) {
-  #mode-4,#mode-3{grid-template-columns:1fr 1fr 1fr}
-}
 </style>
 </head>
 <body>
