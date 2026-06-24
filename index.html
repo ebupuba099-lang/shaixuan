@@ -615,13 +615,42 @@ function toggleReverse(){
       }
       state.results = reversed;
     } else if(state.resultType === '3'){
-      // 三字模式：从numList中排除
-      const resultSet = new Set(state.results.map(r => r.num || r));
+      // 三字模式：反选 = 当前选中位置组合 × 每位置选中数字的全集 - 已有结果
+      const posMap3={'qbs':['qian','bai','shi'],'qbg':['qian','bai','ge'],'qsg':['qian','shi','ge'],'bsg':['bai','shi','ge']};
+      const posIdx={qian:0,bai:1,shi:2,ge:3};
+      const combos=state.pos3Combos.length>0?state.pos3Combos:['qbs','qbg','qsg','bsg'];
+      // 已有结果的key集合（三字结果用num字段，即四位数）
+      const resultSet = new Set();
+      state.results.forEach(r => {
+        const n = r.num || r;
+        const d = _digitCache[n];
+        for(const combo of combos){
+          const positions = posMap3[combo];
+          resultSet.add(combo+'_'+d[posIdx[positions[0]]]+d[posIdx[positions[1]]]+d[posIdx[positions[2]]]);
+        }
+      });
+      // 从 state.num3 生成全量组合
       const reversed = [];
-      const numList = getNumList();
-      for(let _ni=0;_ni<numList.length;_ni++){
-        const num = numList[_ni];
-        if(!resultSet.has(num)) reversed.push(num);
+      const seen = new Set();
+      for(const combo of combos){
+        const positions = posMap3[combo];
+        const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]], idx3 = posIdx[positions[2]];
+        const arr1 = state.num3[positions[0]], arr2 = state.num3[positions[1]], arr3 = state.num3[positions[2]];
+        for(const v1 of arr1){
+          for(const v2 of arr2){
+            for(const v3 of arr3){
+              const key = combo+'_'+v1+v2+v3;
+              if(!resultSet.has(key) && !seen.has(key)){
+                seen.add(key);
+                // 构建四位数：非选中位置填0（用于renderResults显示）
+                const digits=[0,0,0,0];
+                digits[idx1]=v1; digits[idx2]=v2; digits[idx3]=v3;
+                const num=digits[0]*1000+digits[1]*100+digits[2]*10+digits[3];
+                reversed.push({num:num, combo:combo});
+              }
+            }
+          }
+        }
       }
       state.results = reversed;
     } else {
