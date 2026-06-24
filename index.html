@@ -82,6 +82,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .modal-body .example{background:#f5f7fa;border-radius:6px;padding:8px 12px;margin:6px 0;font-size:12px}
 .modal-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#666}
 .modal-close:hover{background:#e0e0e0}
+
+/* ===== PC端宽屏：条件卡片自动分两列（不改原有配色） ===== */
+@media (min-width: 768px) {
+  body{max-width:1300px;margin:0 auto;padding:90px 20px 80px 20px}
+  .mode-tabs{max-width:500px;margin:0 auto 10px;position:static}
+  .top-nav{position:static;background:transparent;max-width:1000px;margin:0 auto 12px}
+  #mode-4,#mode-3,#mode-2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;align-items:start}
+  #mode-4>.card:nth-child(n),#mode-3>.card:nth-child(n),#mode-2>.card:nth-child(n){margin-top:0}
+  #mode-4>.card:first-child,#mode-3>.card:first-child,#mode-2>.card:first-child,
+  #mode-4>div[style*="display:flex"],#mode-3>div[style*="display:flex"],#mode-2>div[style*="display:flex"],
+  #rongcuo-card,#rongcuo3-card{grid-column:1/-1}
+}
+@media (min-width: 1200px) {
+  #mode-4,#mode-3{grid-template-columns:1fr 1fr 1fr}
+}
 </style>
 </head>
 <body>
@@ -302,6 +317,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div style="font-size:11px;color:#f44336;margin-bottom:6px">请选择参与容错的条件，至少3个</div>
 <div id="rc-conditions"></div>
 <div style="font-size:12px;color:#666;margin-top:4px">已选择 <span id="rc-count">0</span> 个条件</div>
+<div style="position:relative;height:20px;margin:6px 0 8px;background:#e8eaed;border-radius:10px;overflow:hidden">
+  <div id="rc-bar" style="height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);border-radius:10px;transition:all 0.2s;width:0%"></div>
+  <span id="rc-bar-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3)">0 ~ 0</span>
+</div>
 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
 <span style="font-size:13px;color:#555">容错范围：</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',-1)">-</button>
@@ -468,6 +487,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div style="font-size:11px;color:#f44336;margin-bottom:6px">请选择参与容错的条件，至少3个</div>
 <div id="rc3-conditions"></div>
 <div style="font-size:12px;color:#666;margin-top:4px">已选择 <span id="rc3-count">0</span> 个条件</div>
+<div style="position:relative;height:20px;margin:6px 0 8px;background:#e8eaed;border-radius:10px;overflow:hidden">
+  <div id="rc3-bar" style="height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);border-radius:10px;transition:all 0.2s;width:0%"></div>
+  <span id="rc3-bar-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3)">0 ~ 0</span>
+</div>
 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
 <span style="font-size:13px;color:#555">容错范围：</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',-1)">-</button>
@@ -617,13 +640,28 @@ function toggleReverse(){
       }
       state.results = reversed;
     } else {
-      // 两字模式类似处理
-      const resultSet = new Set(state.results.map(r => r.num || r));
+      // 两字模式：反选只针对选中位置组合范围内的组合，而非全部10000个四位数
+      const posMap2={'qb':['qian','bai'],'qs':['qian','shi'],'qg':['qian','ge'],'bs':['bai','shi'],'bg':['bai','ge'],'sg':['shi','ge']};
+      const posIdx={qian:0,bai:1,shi:2,ge:3};
+      const combos=state.pos2Combos.length>0?state.pos2Combos:['qb','qs','qg','bs','bg','sg'];
+      const resultSet = new Set();
+      state.results.forEach(r => resultSet.add(r.combo+'_'+r.v1+r.v2));
       const reversed = [];
       const numList = getNumList();
       for(let _ni=0;_ni<numList.length;_ni++){
         const num = numList[_ni];
-        if(!resultSet.has(num)) reversed.push(num);
+        const d = getDigits(num);
+        for(const combo of combos){
+          const positions = posMap2[combo];
+          const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]];
+          const v1 = d[idx1], v2 = d[idx2];
+          if(!state.num2[positions[0]].includes(v1)) continue;
+          if(!state.num2[positions[1]].includes(v2)) continue;
+          const key = combo+'_'+v1+v2;
+          if(!resultSet.has(key)){
+            reversed.push({v1:v1, v2:v2, combo:combo, idx1:idx1, idx2:idx2});
+          }
+        }
       }
       state.results = reversed;
     }
@@ -2596,7 +2634,10 @@ function applyQuickImport(mode){
 
 // ========== 辅助函数 ==========
 function isBrother(a,b){return Math.abs(a-b)===1||Math.abs(a-b)===9}
-function getDigits(num){return[Math.floor(num/1000)%10,Math.floor(num/100)%10,Math.floor(num/10)%10,num%10]}
+// 全局digit缓存（只算一次，多处复用）
+const _digitCache = new Array(10000);
+for(let _i=0;_i<10000;_i++){const s=_i.toString().padStart(4,'0');_digitCache[_i]=[+s[0],+s[1],+s[2],+s[3]];}
+function getDigits(num){return _digitCache[num]||[Math.floor(num/1000)%10,Math.floor(num/100)%10,Math.floor(num/10)%10,num%10]}
 function checkHe(num,key){
   const d=getDigits(num);
   switch(key){
@@ -3456,6 +3497,10 @@ function updateRc3Range(){
 function updateRc3Display(){
   document.getElementById('rc3-min').textContent=state.rongcuo3.minErr;
   document.getElementById('rc3-max').textContent=state.rongcuo3.maxErr;
+  const n=state.rongcuo3.selected.size, min=state.rongcuo3.minErr, max=state.rongcuo3.maxErr;
+  const bar=document.getElementById('rc3-bar'), label=document.getElementById('rc3-bar-label');
+  if(bar&&n>0){bar.style.left=(min/(n+1)*100)+'%';bar.style.width=Math.max(((max-min+1)/(n+1)*100),3)+'%';}
+  if(label)label.textContent=min+' ~ '+max;
 }
 
 function adjustRc3(which,delta){
@@ -3601,6 +3646,10 @@ function updateRcRange(){
 function updateRcDisplay(){
   document.getElementById('rc-min').textContent=state.rongcuo.minErr;
   document.getElementById('rc-max').textContent=state.rongcuo.maxErr;
+  const n=state.rongcuo.selected.size, min=state.rongcuo.minErr, max=state.rongcuo.maxErr;
+  const bar=document.getElementById('rc-bar'), label=document.getElementById('rc-bar-label');
+  if(bar&&n>0){bar.style.left=(min/(n+1)*100)+'%';bar.style.width=Math.max(((max-min+1)/(n+1)*100),3)+'%';}
+  if(label)label.textContent=min+' ~ '+max;
 }
 
 function adjustRc(which,delta){
@@ -3776,12 +3825,8 @@ function doFilterWithRongcuoInternal(){
     }
   }
   
-  // 预计算digit表，避免每次调用getDigits
-  const digitTable=new Array(10000);
-  for(let i=0;i<10000;i++){
-    const s=i.toString().padStart(4,'0');
-    digitTable[i]=[parseInt(s[0]),parseInt(s[1]),parseInt(s[2]),parseInt(s[3])];
-  }
+  // 复用全局digit缓存
+  const digitTable=_digitCache;
   
   const results=[];
   const numList=getNumList();for(let _ni=0;_ni<numList.length;_ni++){const num=numList[_ni];
@@ -3919,41 +3964,32 @@ function fastCondHit(num,d,c,qdSets){
   return false;
 }
 
+let _filterTimer=null,_filterBusy=false;
 function startFilter(){
-  const mode=state.currentMode;
-  let data;
-  if(mode==='4'){
-    if(state.rongcuo.enabled){
-      data={results:doFilterWithRongcuoInternal(),time:'0',type:'4'};
-    }else{
-      data=startFilter4();
-      data.type='4';
-    }
-  }else if(mode==='3'){
-    if(state.rongcuo3.enabled){
-      data={results:doFilterWithRongcuo3Internal(),time:'0',type:'3'};
-    }else{
-      data=startFilter3();
-      data.type='3';
-    }
-  }else{
-    data=startFilter2();
-    data.type='2';
-    data.pos='multi';
-  }
-  
-  state.results=data.results;
-  state.resultType=data.type;
-  state.resultMask=data.mask||null;
-  // 重置反选状态
-  state.isReversed=false;
-  state.resultsOriginal=[];
-  
-  document.getElementById('resultCard').style.display='block';
-  document.getElementById('resultCount').textContent=data.results.length+' 组';
-  document.getElementById('reverseBtn').textContent='反选';
-  document.getElementById('resultTime').textContent='耗时: '+data.time+'ms';
-  renderResults('');
+  if(_filterBusy)return;
+  _filterBusy=true;
+  ['startBtn4','startBtn3','startBtn2'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=true;});
+  clearTimeout(_filterTimer);
+  _filterTimer=setTimeout(()=>{
+    const mode=state.currentMode;
+    let data;
+    if(mode==='4'){
+      if(state.rongcuo.enabled){data={results:doFilterWithRongcuoInternal(),time:'0',type:'4'};}
+      else{data=startFilter4();data.type='4';}
+    }else if(mode==='3'){
+      if(state.rongcuo3.enabled){data={results:doFilterWithRongcuo3Internal(),time:'0',type:'3'};}
+      else{data=startFilter3();data.type='3';}
+    }else{data=startFilter2();data.type='2';data.pos='multi';}
+    state.results=data.results;state.resultType=data.type;state.resultMask=data.mask||null;
+    state.isReversed=false;state.resultsOriginal=[];
+    document.getElementById('resultCard').style.display='block';
+    document.getElementById('resultCount').textContent=data.results.length+' 组';
+    document.getElementById('reverseBtn').textContent='反选';
+    document.getElementById('resultTime').textContent='耗时: '+data.time+'ms';
+    renderResults('');
+    ['startBtn4','startBtn3','startBtn2'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false;});
+    _filterBusy=false;
+  },30);
 }
 
 // 三字模式带容错的过滤函数（内部）
