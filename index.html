@@ -57,7 +57,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .action-btns{display:flex;gap:6px;margin-top:10px;justify-content:center}
 .copy-btn,.export-btn,.share-btn{height:36px;padding:0 14px;border:none;border-radius:6px;font-size:13px;cursor:pointer;color:#fff}
 .copy-btn{background:#1a73e8}
-.export-btn{background:#34a853}
+.export-btn{background:#34a853;display:inline-flex;align-items:center;justify-content:center}
 .share-btn{background:#007AFF}
 .no-cond{color:#888;font-size:12px;padding:4px 0}
 
@@ -625,26 +625,27 @@ function toggleReverse(){
       }
       state.results = reversed;
     } else {
-      // 两字模式：反选只针对选中位置组合范围内的组合，而非全部10000个四位数
+      // 两字模式：反选 = 当前选中位置组合 × 每位置选中数字的全集 - 已有结果
       const posMap2={'qb':['qian','bai'],'qs':['qian','shi'],'qg':['qian','ge'],'bs':['bai','shi'],'bg':['bai','ge'],'sg':['shi','ge']};
       const posIdx={qian:0,bai:1,shi:2,ge:3};
       const combos=state.pos2Combos.length>0?state.pos2Combos:['qb','qs','qg','bs','bg','sg'];
+      // 已有结果的key集合
       const resultSet = new Set();
       state.results.forEach(r => resultSet.add(r.combo+'_'+r.v1+r.v2));
+      // 从 state.num2 生成全量组合（而非10000个四位数）
       const reversed = [];
-      const numList = getNumList();
-      for(let _ni=0;_ni<numList.length;_ni++){
-        const num = numList[_ni];
-        const d = getDigits(num);
-        for(const combo of combos){
-          const positions = posMap2[combo];
-          const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]];
-          const v1 = d[idx1], v2 = d[idx2];
-          if(!state.num2[positions[0]].includes(v1)) continue;
-          if(!state.num2[positions[1]].includes(v2)) continue;
-          const key = combo+'_'+v1+v2;
-          if(!resultSet.has(key)){
-            reversed.push({v1:v1, v2:v2, combo:combo, idx1:idx1, idx2:idx2});
+      const seen = new Set();
+      for(const combo of combos){
+        const positions = posMap2[combo];
+        const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]];
+        const arr1 = state.num2[positions[0]], arr2 = state.num2[positions[1]];
+        for(const v1 of arr1){
+          for(const v2 of arr2){
+            const key = combo+'_'+v1+v2;
+            if(!resultSet.has(key) && !seen.has(key)){
+              seen.add(key);
+              reversed.push({v1:v1, v2:v2, combo:combo, idx1:idx1, idx2:idx2});
+            }
           }
         }
       }
