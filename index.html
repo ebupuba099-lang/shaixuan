@@ -654,43 +654,26 @@ function toggleReverse(){
       }
       state.results = reversed;
     } else {
-      // 两字模式：每个combo独立反选
+      // 两字模式：每个combo独立反选，用筛选时的num2快照
       const posMap2={'qb':['qian','bai'],'qs':['qian','shi'],'qg':['qian','ge'],'bs':['bai','shi'],'bg':['bai','ge'],'sg':['shi','ge']};
       const posIdx={qian:0,bai:1,shi:2,ge:3};
       const combos=state.pos2Combos.length>0?state.pos2Combos:['qb','qs','qg','bs','bg','sg'];
+      const num2 = state._num2Snapshot || state.num2;
       
-      // 第一步：按combo分组已有结果，同时反推每个combo的数字范围
+      // 按combo分组已有结果
       const comboResultSet={};
-      const comboRange={};
-      combos.forEach(c => {comboResultSet[c]=new Set(); comboRange[c]={v1Set:new Set(), v2Set:new Set()};});
-      
-      console.log('=== 两字反选 ===');
-      console.log('combos:', combos, 'results.length:', state.results.length);
-      if(state.results.length>0){
-        console.log('results[0]:', JSON.stringify(state.results[0]));
-        console.log('results[1]:', JSON.stringify(state.results[1]));
-      }
-      
+      combos.forEach(c => {comboResultSet[c]=new Set();});
       state.results.forEach(r => {
-        const c = r.combo;
-        if(!comboResultSet[c]) return;
-        comboResultSet[c].add(r.v1+'_'+r.v2);
-        comboRange[c].v1Set.add(r.v1);
-        comboRange[c].v2Set.add(r.v2);
+        if(comboResultSet[r.combo]) comboResultSet[r.combo].add(r.v1+'_'+r.v2);
       });
       
-      // 第二步：每个combo独立生成反选
+      // 每个combo独立生成反选
       const reversed = [];
       for(const combo of combos){
         const positions = posMap2[combo];
         const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]];
-        const range = comboRange[combo];
+        const arr1 = num2[positions[0]], arr2 = num2[positions[1]];
         const resultSet = comboResultSet[combo];
-        
-        const arr1 = [...range.v1Set].sort((a,b)=>a-b);
-        const arr2 = [...range.v2Set].sort((a,b)=>a-b);
-        
-        console.log(combo+': v1='+arr1+' v2='+arr2+' 已有='+resultSet.size);
         
         for(const v1 of arr1){
           for(const v2 of arr2){
@@ -701,7 +684,6 @@ function toggleReverse(){
           }
         }
       }
-      console.log('反选结果:', reversed.length);
       state.results = reversed;
     }
     state.isReversed = true;
@@ -4018,7 +4000,11 @@ function startFilter(){
     }else if(mode==='3'){
       if(state.rongcuo3.enabled){data={results:doFilterWithRongcuo3Internal(),time:'0',type:'3'};}
       else{data=startFilter3();data.type='3';}
-    }else{data=startFilter2();data.type='2';data.pos='multi';}
+    }else{
+      // 两字模式：筛选前深拷贝num2，反选时用它（不受后续操作影响）
+      state._num2Snapshot=JSON.parse(JSON.stringify(state.num2));
+      data=startFilter2();data.type='2';data.pos='multi';
+    }
     state.results=data.results;state.resultType=data.type;state.resultMask=data.mask||null;
     state.isReversed=false;state.resultsOriginal=[];
     document.getElementById('resultCard').style.display='block';
