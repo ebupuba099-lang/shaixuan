@@ -654,41 +654,41 @@ function toggleReverse(){
       }
       state.results = reversed;
     } else {
-      // 两字模式：反选 = 当前选中位置组合 × 每位置选中数字的全集 - 已有结果
-      // 关键：使用原始筛选时的数字范围（从results反推），而不是state.num2（可能被清空）
+      // 两字模式：每个combo独立反选
+      // 6个组合独立计算，反选 = 该combo的全量组合 - 该combo的已有结果
       const posMap2={'qb':['qian','bai'],'qs':['qian','shi'],'qg':['qian','ge'],'bs':['bai','shi'],'bg':['bai','ge'],'sg':['shi','ge']};
       const posIdx={qian:0,bai:1,shi:2,ge:3};
       const combos=state.pos2Combos.length>0?state.pos2Combos:['qb','qs','qg','bs','bg','sg'];
       
-      // 从筛选结果反推每个combo实际使用的数字范围
-      const comboDigitRange = {};
-      combos.forEach(c => comboDigitRange[c] = {v1Set:new Set(), v2Set:new Set()});
+      // 第一步：按combo分组已有结果，同时反推每个combo的数字范围
+      const comboResultSet={}; // combo -> Set of 'v1_v2'
+      const comboRange={};     // combo -> {v1Set, v2Set}
+      combos.forEach(c => {comboResultSet[c]=new Set(); comboRange[c]={v1Set:new Set(), v2Set:new Set()};});
+      
       state.results.forEach(r => {
-        if(comboDigitRange[r.combo]){
-          comboDigitRange[r.combo].v1Set.add(r.v1);
-          comboDigitRange[r.combo].v2Set.add(r.v2);
-        }
+        const c = r.combo;
+        if(!comboResultSet[c]) return;
+        comboResultSet[c].add(r.v1+'_'+r.v2);
+        comboRange[c].v1Set.add(r.v1);
+        comboRange[c].v2Set.add(r.v2);
       });
       
-      // 已有结果的key集合
-      const resultSet = new Set();
-      state.results.forEach(r => resultSet.add(r.combo+'_'+r.v1+r.v2));
-      
-      // 从每个combo的实际数字范围生成全量组合
+      // 第二步：每个combo独立生成反选
       const reversed = [];
-      const seen = new Set();
       for(const combo of combos){
         const positions = posMap2[combo];
         const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]];
-        const range = comboDigitRange[combo];
-        // 如果没有结果用这个combo，默认用0-9
-        const arr1 = range.v1Set.size > 0 ? [...range.v1Set].sort((a,b)=>a-b) : [0,1,2,3,4,5,6,7,8,9];
-        const arr2 = range.v2Set.size > 0 ? [...range.v2Set].sort((a,b)=>a-b) : [0,1,2,3,4,5,6,7,8,9];
+        const range = comboRange[combo];
+        const resultSet = comboResultSet[combo];
+        
+        // 从该combo的结果反推数字范围，排序
+        const arr1 = [...range.v1Set].sort((a,b)=>a-b);
+        const arr2 = [...range.v2Set].sort((a,b)=>a-b);
+        
         for(const v1 of arr1){
           for(const v2 of arr2){
-            const key = combo+'_'+v1+v2;
-            if(!resultSet.has(key) && !seen.has(key)){
-              seen.add(key);
+            const key = v1+'_'+v2;
+            if(!resultSet.has(key)){
               reversed.push({v1:v1, v2:v2, combo:combo, idx1:idx1, idx2:idx2});
             }
           }
