@@ -655,15 +655,21 @@ function toggleReverse(){
       state.results = reversed;
     } else {
       // 两字模式：每个combo独立反选
-      // 6个组合独立计算，反选 = 该combo的全量组合 - 该combo的已有结果
       const posMap2={'qb':['qian','bai'],'qs':['qian','shi'],'qg':['qian','ge'],'bs':['bai','shi'],'bg':['bai','ge'],'sg':['shi','ge']};
       const posIdx={qian:0,bai:1,shi:2,ge:3};
       const combos=state.pos2Combos.length>0?state.pos2Combos:['qb','qs','qg','bs','bg','sg'];
       
       // 第一步：按combo分组已有结果，同时反推每个combo的数字范围
-      const comboResultSet={}; // combo -> Set of 'v1_v2'
-      const comboRange={};     // combo -> {v1Set, v2Set}
+      const comboResultSet={};
+      const comboRange={};
       combos.forEach(c => {comboResultSet[c]=new Set(); comboRange[c]={v1Set:new Set(), v2Set:new Set()};});
+      
+      console.log('=== 两字反选 ===');
+      console.log('combos:', combos, 'results.length:', state.results.length);
+      if(state.results.length>0){
+        console.log('results[0]:', JSON.stringify(state.results[0]));
+        console.log('results[1]:', JSON.stringify(state.results[1]));
+      }
       
       state.results.forEach(r => {
         const c = r.combo;
@@ -681,9 +687,10 @@ function toggleReverse(){
         const range = comboRange[combo];
         const resultSet = comboResultSet[combo];
         
-        // 从该combo的结果反推数字范围，排序
         const arr1 = [...range.v1Set].sort((a,b)=>a-b);
         const arr2 = [...range.v2Set].sort((a,b)=>a-b);
+        
+        console.log(combo+': v1='+arr1+' v2='+arr2+' 已有='+resultSet.size);
         
         for(const v1 of arr1){
           for(const v2 of arr2){
@@ -694,6 +701,7 @@ function toggleReverse(){
           }
         }
       }
+      console.log('反选结果:', reversed.length);
       state.results = reversed;
     }
     state.isReversed = true;
