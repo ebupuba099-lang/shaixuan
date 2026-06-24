@@ -82,6 +82,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .modal-body .example{background:#f5f7fa;border-radius:6px;padding:8px 12px;margin:6px 0;font-size:12px}
 .modal-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#666}
 .modal-close:hover{background:#e0e0e0}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.result-item.hl-match{background:#e8f5e9;border-color:#66bb6a}
+.result-item.hl-match mark{background:#ffeb3b;color:#333;border-radius:2px;padding:0 2px}
+.result-item:not(.hl-match){opacity:0.35;transition:opacity 0.15s}
 </style>
 </head>
 <body>
@@ -302,18 +306,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div style="font-size:11px;color:#f44336;margin-bottom:6px">请选择参与容错的条件，至少3个</div>
 <div id="rc-conditions"></div>
 <div style="font-size:12px;color:#666;margin-top:4px">已选择 <span id="rc-count">0</span> 个条件</div>
-<div style="position:relative;height:20px;margin:6px 0 8px;background:#e8eaed;border-radius:10px;overflow:hidden">
-  <div id="rc-bar" style="height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);border-radius:10px;transition:all 0.2s;width:0%"></div>
-  <span id="rc-bar-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3)">0 ~ 0</span>
-</div>
 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
 <span style="font-size:13px;color:#555">容错范围：</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',-1)">-</button>
-<span id="rc-min" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
-	<button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',1)">+</button>
+<input type="number" id="rc-min" style="width:50px;font-size:15px;font-weight:600;text-align:center;border:1px solid #dadce0;border-radius:4px;padding:2px 4px;-moz-appearance:textfield" value="0" onchange="onRcInput('min')" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<button class="btn btn-num" style="min-width:32px" onclick="adjustRc('min',1)">+</button>
 <span style="color:#999">~</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('max',-1)">-</button>
-<span id="rc-max" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
+<input type="number" id="rc-max" style="width:50px;font-size:15px;font-weight:600;text-align:center;border:1px solid #dadce0;border-radius:4px;padding:2px 4px;-moz-appearance:textfield" value="0" onchange="onRcInput('max')" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc('max',1)">+</button>
 </div>
 <div style="display:flex;gap:8px;margin-top:10px">
@@ -472,18 +472,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div style="font-size:11px;color:#f44336;margin-bottom:6px">请选择参与容错的条件，至少3个</div>
 <div id="rc3-conditions"></div>
 <div style="font-size:12px;color:#666;margin-top:4px">已选择 <span id="rc3-count">0</span> 个条件</div>
-<div style="position:relative;height:20px;margin:6px 0 8px;background:#e8eaed;border-radius:10px;overflow:hidden">
-  <div id="rc3-bar" style="height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);border-radius:10px;transition:all 0.2s;width:0%"></div>
-  <span id="rc3-bar-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3)">0 ~ 0</span>
-</div>
 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
 <span style="font-size:13px;color:#555">容错范围：</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',-1)">-</button>
-<span id="rc3-min" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
-	<button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',1)">+</button>
+<input type="number" id="rc3-min" style="width:50px;font-size:15px;font-weight:600;text-align:center;border:1px solid #dadce0;border-radius:4px;padding:2px 4px;-moz-appearance:textfield" value="0" onchange="onRc3Input('min')" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('min',1)">+</button>
 <span style="color:#999">~</span>
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('max',-1)">-</button>
-<span id="rc3-max" style="font-size:15px;font-weight:600;min-width:20px;text-align:center">0</span>
+<input type="number" id="rc3-max" style="width:50px;font-size:15px;font-weight:600;text-align:center;border:1px solid #dadce0;border-radius:4px;padding:2px 4px;-moz-appearance:textfield" value="0" onchange="onRc3Input('max')" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 <button class="btn btn-num" style="min-width:32px" onclick="adjustRc3('max',1)">+</button>
 </div>
 <div style="display:flex;gap:8px;margin-top:10px">
@@ -615,76 +611,69 @@ function toggleReverse(){
       }
       state.results = reversed;
     } else if(state.resultType === '3'){
-      // 三字模式：反选 = 当前选中位置组合 × 每位置选中数字的全集 - 已有结果
+      // 三字模式：反选 = 全集(0-9×0-9×0-9=1000) - 已有结果
       const posMap3={'qbs':['qian','bai','shi'],'qbg':['qian','bai','ge'],'qsg':['qian','shi','ge'],'bsg':['bai','shi','ge']};
       const posIdx={qian:0,bai:1,shi:2,ge:3};
       const combos=state.pos3Combos.length>0?state.pos3Combos:['qbs','qbg','qsg','bsg'];
-      // 已有结果的key集合（三字结果用num字段，即四位数）
-      const resultSet = new Set();
-      state.results.forEach(r => {
-        const n = r.num || r;
-        const d = _digitCache[n];
+      const FULL=[0,1,2,3,4,5,6,7,8,9];
+      // 按combo收集已有结果的key
+      const comboResultSet={};
+      combos.forEach(c=>{comboResultSet[c]=new Set();});
+      state.results.forEach(r=>{
+        const n=r.num||r;
+        const d=_digitCache[n];
         for(const combo of combos){
-          const positions = posMap3[combo];
-          resultSet.add(combo+'_'+d[posIdx[positions[0]]]+d[posIdx[positions[1]]]+d[posIdx[positions[2]]]);
+          const pos=posMap3[combo];
+          comboResultSet[combo].add(combo+'_'+d[posIdx[pos[0]]]+d[posIdx[pos[1]]]+d[posIdx[pos[2]]]);
         }
       });
-      // 从 state.num3 生成全量组合
-      const reversed = [];
-      const seen = new Set();
+      // 全集-已有=反选
+      const reversed=[];
+      const seen=new Set();
       for(const combo of combos){
-        const positions = posMap3[combo];
-        const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]], idx3 = posIdx[positions[2]];
-        const arr1 = state.num3[positions[0]], arr2 = state.num3[positions[1]], arr3 = state.num3[positions[2]];
-        for(const v1 of arr1){
-          for(const v2 of arr2){
-            for(const v3 of arr3){
-              const key = combo+'_'+v1+v2+v3;
-              if(!resultSet.has(key) && !seen.has(key)){
+        const pos=posMap3[combo];
+        const i1=posIdx[pos[0]],i2=posIdx[pos[1]],i3=posIdx[pos[2]];
+        for(const v1 of FULL){
+          for(const v2 of FULL){
+            for(const v3 of FULL){
+              const key=combo+'_'+v1+v2+v3;
+              if(!comboResultSet[combo].has(key)&&!seen.has(key)){
                 seen.add(key);
-                // 构建四位数：非选中位置填0（用于renderResults显示）
                 const digits=[0,0,0,0];
-                digits[idx1]=v1; digits[idx2]=v2; digits[idx3]=v3;
-                const num=digits[0]*1000+digits[1]*100+digits[2]*10+digits[3];
-                reversed.push({num:num, combo:combo});
+                digits[i1]=v1;digits[i2]=v2;digits[i3]=v3;
+                reversed.push({num:digits[0]*1000+digits[1]*100+digits[2]*10+digits[3],combo:combo});
               }
             }
           }
         }
       }
-      state.results = reversed;
+      state.results=reversed;
     } else {
-      // 两字模式：每个combo独立反选，用筛选时的num2快照
+      // 两字模式：反选 = 全集(0-9×0-9=100) - 已有结果
       const posMap2={'qb':['qian','bai'],'qs':['qian','shi'],'qg':['qian','ge'],'bs':['bai','shi'],'bg':['bai','ge'],'sg':['shi','ge']};
       const posIdx={qian:0,bai:1,shi:2,ge:3};
       const combos=state.pos2Combos.length>0?state.pos2Combos:['qb','qs','qg','bs','bg','sg'];
-      const num2 = state._num2Snapshot || state.num2;
-      
-      // 按combo分组已有结果
+      const FULL=[0,1,2,3,4,5,6,7,8,9];
+      // 按combo收集已有结果
       const comboResultSet={};
-      combos.forEach(c => {comboResultSet[c]=new Set();});
-      state.results.forEach(r => {
-        if(comboResultSet[r.combo]) comboResultSet[r.combo].add(r.v1+'_'+r.v2);
+      combos.forEach(c=>{comboResultSet[c]=new Set();});
+      state.results.forEach(r=>{
+        if(comboResultSet[r.combo])comboResultSet[r.combo].add(r.v1+'_'+r.v2);
       });
-      
-      // 每个combo独立生成反选
-      const reversed = [];
+      // 全集-已有=反选
+      const reversed=[];
       for(const combo of combos){
-        const positions = posMap2[combo];
-        const idx1 = posIdx[positions[0]], idx2 = posIdx[positions[1]];
-        const arr1 = num2[positions[0]], arr2 = num2[positions[1]];
-        const resultSet = comboResultSet[combo];
-        
-        for(const v1 of arr1){
-          for(const v2 of arr2){
-            const key = v1+'_'+v2;
-            if(!resultSet.has(key)){
-              reversed.push({v1:v1, v2:v2, combo:combo, idx1:idx1, idx2:idx2});
+        const pos=posMap2[combo];
+        const i1=posIdx[pos[0]],i2=posIdx[pos[1]];
+        for(const v1 of FULL){
+          for(const v2 of FULL){
+            if(!comboResultSet[combo].has(v1+'_'+v2)){
+              reversed.push({v1,v2,combo:combo,idx1:i1,idx2:i2});
             }
           }
         }
       }
-      state.results = reversed;
+      state.results=reversed;
     }
     state.isReversed = true;
   }
@@ -747,7 +736,17 @@ function customAlert(title, msg){
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center';
   const box = document.createElement('div');
   box.style.cssText = 'background:#fff;border-radius:12px;padding:20px;max-width:280px;text-align:center';
-  box.innerHTML = '<div style="font-size:15px;font-weight:700;color:#333;margin-bottom:10px">'+title+'</div><div style="font-size:13px;color:#666">'+msg+'</div><button onclick="this.closest(\'div[style*=\"position:fixed\"]\').remove()" style="margin-top:15px;padding:8px 24px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer">确定</button>';
+  const titleDiv=document.createElement('div');
+  titleDiv.style.cssText='font-size:15px;font-weight:700;color:#333;margin-bottom:10px';
+  titleDiv.textContent=title;
+  const msgDiv=document.createElement('div');
+  msgDiv.style.cssText='font-size:13px;color:#666';
+  msgDiv.textContent=msg;
+  const btn=document.createElement('button');
+  btn.style.cssText='margin-top:15px;padding:8px 24px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer';
+  btn.textContent='确定';
+  btn.onclick=()=>overlay.remove();
+  box.appendChild(titleDiv);box.appendChild(msgDiv);box.appendChild(btn);
   overlay.appendChild(box);
   document.body.appendChild(overlay);
   overlay.addEventListener('click', function(e){
@@ -765,7 +764,7 @@ const navItems4=[
   {id:'fl-card',label:'分离'},
   {id:'ds-card',label:'对数'},
   {id:'fine-card',label:'精细调整'},
-  {id:'rc-card',label:'容错'}
+  {id:'rongcuo-card',label:'容错'}
 ];
 const navItems3=[
   {id:'pos3-card',label:'位置组合'},
@@ -837,6 +836,7 @@ function scrollToBottom(){
 }
 
 const state={
+  resultType:'4', // 当前结果类型
   // 四字模式状态
   num:{qian:[0,1,2,3,4,5,6,7,8,9],bai:[0,1,2,3,4,5,6,7,8,9],shi:[0,1,2,3,4,5,6,7,8,9],ge:[0,1,2,3,4,5,6,7,8,9]},
   he:{},
@@ -3516,12 +3516,23 @@ function updateRc3Range(){
 }
 
 function updateRc3Display(){
-  document.getElementById('rc3-min').textContent=state.rongcuo3.minErr;
-  document.getElementById('rc3-max').textContent=state.rongcuo3.maxErr;
-  const n=state.rongcuo3.selected.size, min=state.rongcuo3.minErr, max=state.rongcuo3.maxErr;
-  const bar=document.getElementById('rc3-bar'), label=document.getElementById('rc3-bar-label');
-  if(bar&&n>0){bar.style.left=(min/(n+1)*100)+'%';bar.style.width=Math.max(((max-min+1)/(n+1)*100),3)+'%';}
-  if(label)label.textContent=min+' ~ '+max;
+  document.getElementById('rc3-min').value=state.rongcuo3.minErr;
+  document.getElementById('rc3-max').value=state.rongcuo3.maxErr;
+}
+
+function onRc3Input(which){
+  const n=state.rongcuo3.selected.size;
+  if(n===0){updateRc3Display();return;}
+  const el=document.getElementById('rc3-'+which);
+  let v=parseInt(el.value)||0;
+  if(which==='min'){
+    v=Math.max(0,Math.min(v,state.rongcuo3.maxErr));
+    state.rongcuo3.minErr=v;
+  }else{
+    v=Math.max(state.rongcuo3.minErr,Math.min(v,n));
+    state.rongcuo3.maxErr=v;
+  }
+  updateRc3Display();
 }
 
 function adjustRc3(which,delta){
@@ -3665,12 +3676,23 @@ function updateRcRange(){
 }
 
 function updateRcDisplay(){
-  document.getElementById('rc-min').textContent=state.rongcuo.minErr;
-  document.getElementById('rc-max').textContent=state.rongcuo.maxErr;
-  const n=state.rongcuo.selected.size, min=state.rongcuo.minErr, max=state.rongcuo.maxErr;
-  const bar=document.getElementById('rc-bar'), label=document.getElementById('rc-bar-label');
-  if(bar&&n>0){bar.style.left=(min/(n+1)*100)+'%';bar.style.width=Math.max(((max-min+1)/(n+1)*100),3)+'%';}
-  if(label)label.textContent=min+' ~ '+max;
+  document.getElementById('rc-min').value=state.rongcuo.minErr;
+  document.getElementById('rc-max').value=state.rongcuo.maxErr;
+}
+
+function onRcInput(which){
+  const n=state.rongcuo.selected.size;
+  if(n===0){updateRcDisplay();return;}
+  const el=document.getElementById('rc-'+which);
+  let v=parseInt(el.value)||0;
+  if(which==='min'){
+    v=Math.max(0,Math.min(v,state.rongcuo.maxErr));
+    state.rongcuo.minErr=v;
+  }else{
+    v=Math.max(state.rongcuo.minErr,Math.min(v,n));
+    state.rongcuo.maxErr=v;
+  }
+  updateRcDisplay();
 }
 
 function adjustRc(which,delta){
@@ -3985,36 +4007,41 @@ function fastCondHit(num,d,c,qdSets){
   return false;
 }
 
-let _filterTimer=null,_filterBusy=false;
 function startFilter(){
-  if(_filterBusy)return;
-  _filterBusy=true;
-  ['startBtn4','startBtn3','startBtn2'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=true;});
-  clearTimeout(_filterTimer);
-  _filterTimer=setTimeout(()=>{
-    const mode=state.currentMode;
-    let data;
-    if(mode==='4'){
-      if(state.rongcuo.enabled){data={results:doFilterWithRongcuoInternal(),time:'0',type:'4'};}
-      else{data=startFilter4();data.type='4';}
-    }else if(mode==='3'){
-      if(state.rongcuo3.enabled){data={results:doFilterWithRongcuo3Internal(),time:'0',type:'3'};}
-      else{data=startFilter3();data.type='3';}
+  const mode=state.currentMode;
+  let data;
+  if(mode==='4'){
+    if(state.rongcuo.enabled){
+      data={results:doFilterWithRongcuoInternal(),time:'0',type:'4'};
     }else{
-      // 两字模式：筛选前深拷贝num2，反选时用它（不受后续操作影响）
-      state._num2Snapshot=JSON.parse(JSON.stringify(state.num2));
-      data=startFilter2();data.type='2';data.pos='multi';
+      data=startFilter4();
+      data.type='4';
     }
-    state.results=data.results;state.resultType=data.type;state.resultMask=data.mask||null;
-    state.isReversed=false;state.resultsOriginal=[];
-    document.getElementById('resultCard').style.display='block';
-    document.getElementById('resultCount').textContent=data.results.length+' 组';
-    document.getElementById('reverseBtn').textContent='反选';
-    document.getElementById('resultTime').textContent='耗时: '+data.time+'ms';
-    renderResults('');
-    ['startBtn4','startBtn3','startBtn2'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false;});
-    _filterBusy=false;
-  },30);
+  }else if(mode==='3'){
+    if(state.rongcuo3.enabled){
+      data={results:doFilterWithRongcuo3Internal(),time:'0',type:'3'};
+    }else{
+      data=startFilter3();
+      data.type='3';
+    }
+  }else{
+    data=startFilter2();
+    data.type='2';
+    data.pos='multi';
+  }
+  
+  state.results=data.results;
+  state.resultType=data.type;
+  state.resultMask=data.mask||null;
+  // 重置反选状态
+  state.isReversed=false;
+  state.resultsOriginal=[];
+  
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('resultCount').textContent=data.results.length+' 组';
+  document.getElementById('reverseBtn').textContent='反选';
+  document.getElementById('resultTime').textContent='耗时: '+data.time+'ms';
+  renderResults('');
 }
 
 // 三字模式带容错的过滤函数（内部）
@@ -4185,6 +4212,27 @@ function checkCond3Hit(d3,zhi3Val,combo,cond,qd3Sets){
 
 
 // ========== 结果 ==========
+function highlightResults(keyword){
+  const items=document.querySelectorAll('#resultList .result-item');
+  if(!keyword){
+    items.forEach(el=>{el.innerHTML=el._text||el.textContent;el.classList.remove('hl-match')});
+    return;
+  }
+  const esc=keyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=new RegExp('('+esc+')','gi');
+  items.forEach(el=>{
+    const txt=el._text||el.textContent;
+    if(!el._text)el._text=txt;
+    if(re.test(txt)){
+      el.innerHTML=txt.replace(re,'<mark>$1</mark>');
+      el.classList.add('hl-match');
+    }else{
+      el.innerHTML=txt;
+      el.classList.remove('hl-match');
+    }
+  });
+}
+
 function renderResults(keyword){
   const list=document.getElementById('resultList');
   list.innerHTML='';
@@ -4269,7 +4317,6 @@ document.getElementById('rcBtn3').onclick=function(){
   state.rongcuo3.maxErr=2;
   showRongcuo3();
 };
-document.getElementById('searchInput').oninput=function(){renderResults('')};
 document.getElementById('searchInput').onkeydown=function(e){if(e.key==='Enter')document.getElementById('searchBtn').click()};
 document.getElementById('searchBtn').onclick=function(){
   const keyword=document.getElementById('searchInput').value.trim();
@@ -4292,15 +4339,43 @@ document.getElementById('searchBtn').onclick=function(){
     }
     if(s.includes(keyword))found.push(s);
   });
-  renderResults(keyword);
+  highlightResults(keyword);
+  // 显示查找结果弹窗
+  const overlay=document.getElementById('searchResultOverlay');
+  const esc=keyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=new RegExp('('+esc+')','gi');
   if(found.length>0){
-    const show=found.slice(0,20);
-    let msg='找到 '+found.length+' 组匹配：\n\n'+show.join('  ');
-    if(found.length>20)msg+='\n\n...还有'+(found.length-20)+'组';
-    customAlert('查找结果',msg);
+    document.getElementById('srTitle').textContent='🔍 查找结果';
+    document.getElementById('srSummary').textContent='找到 '+found.length+' 组匹配 "'+keyword+'"';
+    const list=document.getElementById('srList');
+    list.innerHTML='';
+    const maxShow=100;
+    found.slice(0,maxShow).forEach(s=>{
+      const span=document.createElement('span');
+      span.style.cssText='display:inline-block;padding:4px 10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;font-size:15px;font-weight:600;font-family:monospace;color:#2e7d32';
+      span.innerHTML=s.replace(re,'<mark style="background:#ffeb3b;color:#333;border-radius:2px;padding:0 2px">$1</mark>');
+      list.appendChild(span);
+    });
+    if(found.length>maxShow){
+      const more=document.createElement('div');
+      more.style.cssText='text-align:center;color:#999;font-size:12px;padding:8px;width:100%';
+      more.textContent='...还有 '+(found.length-maxShow)+' 组未显示';
+      list.appendChild(more);
+    }
+    const copyBtn=document.getElementById('srCopyBtn');
+    copyBtn.style.display='';
+    copyBtn.onclick=()=>{
+      navigator.clipboard.writeText(found.join('\n')).then(()=>{
+        copyBtn.textContent='已复制!';setTimeout(()=>{copyBtn.textContent='复制全部'},1500);
+      });
+    };
   }else{
-    customAlert('查找结果','未找到包含 "'+keyword+'" 的号码');
+    document.getElementById('srTitle').textContent='🔍 未找到';
+    document.getElementById('srSummary').textContent='未找到包含 "'+keyword+'" 的号码';
+    document.getElementById('srList').innerHTML='<div style="text-align:center;color:#999;padding:20px;width:100%">😔 没有匹配结果</div>';
+    document.getElementById('srCopyBtn').style.display='none';
   }
+  overlay.style.display='flex';
 };
 
 function formatResults(){
@@ -4339,8 +4414,8 @@ document.getElementById('copyBtn').onclick=function(){
   navigator.clipboard.writeText(t).then(()=>{this.textContent='已复制!';setTimeout(()=>this.textContent='一键复制',2000)}).catch(()=>{fallbackCopy(t)});
 };
 function fallbackCopy(text){
-  const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px';
-  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  // 仅用于极旧浏览器降级，现代浏览器用 navigator.clipboard.writeText
+  try{navigator.clipboard.writeText(text)}catch(e){}
 }
 document.getElementById('exportBtn').onclick=function(){
   const t=formatResults();
@@ -4646,7 +4721,8 @@ function clearCurrentMode(){
   if(mode==='4'){
     state.num={qian:[0,1,2,3,4,5,6,7,8,9],bai:[0,1,2,3,4,5,6,7,8,9],shi:[0,1,2,3,4,5,6,7,8,9],ge:[0,1,2,3,4,5,6,7,8,9]};
     heKeys.forEach(k=>state.he[k]={mode:null,selected:[]});
-    state.heAny={mode:null,selected:[]};
+    state.heAny3={mode:null,selected:[]};
+    state.heAny2={mode:null,selected:[]};
     state.zhi=Array.from({length:37},(_,i)=>i);
     Object.keys(state.bro).forEach(k=>state.bro[k]={mode:null});
     state.quandao={mode:null,digits:''};
@@ -4698,7 +4774,7 @@ function exportState(){
   const data=cloneFilterState(mode);
   const json=JSON.stringify(data);
   // Base64编码
-  const code=btoa(unescape(encodeURIComponent(json)));
+  const code=btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g,(_,p)=>String.fromCharCode('0x'+p)));
   const modeName=mode==='4'?'四字':mode==='3'?'三字':'两字';
   // 显示导出弹窗
   showExportModal(modeName,code);
@@ -4741,8 +4817,7 @@ function copyExportCode(){
     navigator.clipboard.writeText(el.value);
     showToast('已复制到剪贴板');
   }catch(e){
-    document.execCommand('copy');
-    showToast('已复制');
+    showToast('复制失败');
   }
 }
 
@@ -4784,7 +4859,7 @@ function doImport(){
       else if(modeName==='三字')mode='3';
       else if(modeName==='两字')mode='2';
     }
-    const json=decodeURIComponent(escape(atob(b64)));
+    const json=decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
     const data=JSON.parse(json);
     restoreFilterState(mode,data);
     document.getElementById('importModal').style.display='none';
@@ -4834,7 +4909,7 @@ function customPrompt(title,message,defaultValue,callback){
 function customAlert(title,message){
   const el=document.getElementById('customAlert');
   document.getElementById('caTitle').textContent=title||'提示';
-  document.getElementById('caMessage').innerHTML=(message||'').replace(/\n/g,'<br>');
+  document.getElementById('caMessage').textContent=message||'';
   el.style.display='block';
   document.getElementById('caOk').onclick=null;
   document.getElementById('caOk').onclick=()=>{el.style.display='none'};
@@ -4882,6 +4957,22 @@ init();
     <div id="caMessage" style="font-size:14px;color:#666;margin-bottom:16px;line-height:1.5">内容</div>
     <div style="display:flex;justify-content:flex-end">
       <button id="caOk" style="padding:8px 20px;border:none;border-radius:8px;background:#1a73e8;color:#fff;font-size:14px;cursor:pointer;font-weight:600">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 查找结果弹窗 -->
+<div id="searchResultOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99999;display:none;justify-content:center;align-items:center" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:16px;width:92%;max-width:400px;max-height:80vh;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eee">
+      <span id="srTitle" style="font-size:16px;font-weight:700;color:#1a73e8">🔍 查找结果</span>
+      <button onclick="document.getElementById('searchResultOverlay').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;line-height:1;padding:0">×</button>
+    </div>
+    <div id="srSummary" style="padding:8px 20px;font-size:13px;color:#666;background:#f8f9fa;border-bottom:1px solid #eee"></div>
+    <div id="srList" style="flex:1;overflow-y:auto;padding:10px 20px;min-height:60px;max-height:50vh;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start"></div>
+    <div style="padding:12px 20px;border-top:1px solid #eee;display:flex;gap:8px;justify-content:flex-end">
+      <button id="srCopyBtn" style="padding:8px 16px;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#333;font-size:13px;cursor:pointer">复制全部</button>
+      <button onclick="document.getElementById('searchResultOverlay').style.display='none'" style="padding:8px 16px;border:none;border-radius:8px;background:#1a73e8;color:#fff;font-size:13px;cursor:pointer;font-weight:600">关闭</button>
     </div>
   </div>
 </div>
